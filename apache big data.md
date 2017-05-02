@@ -2,12 +2,11 @@
 >技术研发中心  
 
 组件
-----
+-
 
 ![](http://i.imgur.com/TGjoj1b.png)
 
 Hadoop
-
 > hadoop主要包含三个组件：hdfs、mapreduce、yarn
 
 
@@ -190,12 +189,14 @@ Kafka
 
 应用场景
 
-##日志收集处理
+日志收集处理
+-
 ![](http://i.imgur.com/bcslRpZ.png)
 
 >用户的线上行为会被记录为用户日志，flume监控日志文件目录，配置扇出通道，其一把数据同步到hdfs，其二把数据写到kafaka集群。hdfs上的数据应用hive进行分析，并把分析结果数据通过sqoop导入到mysql；kafka中的数据则通过spark streaming进行流式处理，结果数据存入redis。
 
-##新平台项目应用
+新平台项目应用
+-
 ![](http://i.imgur.com/VwWJFzL.png)
 
 >该项目通过hive按照日期分区的方式，每天定时把新增数据导入到新增分区中进行分析，kylin使用hive的KYLIN_ANALYSIS表，把全表的字段作为维度，对表中的:USER_ID，IP，URL,TP(页面停留时间)，进行度量，通过kylin的预计算，把结果存放到hbase中，用来提升查询效率。
