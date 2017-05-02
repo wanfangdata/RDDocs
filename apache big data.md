@@ -1,12 +1,12 @@
-#大数据组件介绍
+大数据组件介绍
 >技术研发中心  
 
-#组件
+组件
 ----
 
 ![](http://i.imgur.com/TGjoj1b.png)
 
-##Hadoop
+Hadoop
 
 > hadoop主要包含三个组件：hdfs、mapreduce、yarn
 
@@ -83,8 +83,8 @@ YARN
 
 >>目前多个计算框架可以运行在YARN上，比如MapReduce、Spark、Storm等
 
-##Hbase
-
+Hbase
+-
 >HBase – Hadoop Database，是一个高可靠性、高性能、面向列、可伸缩、实时读写的分布式数据库
 
 >利用Hadoop HDFS作为其文件存储系统,利用Hadoop MapReduce来处理HBase中的海量数据,利用Zookeeper作为其分布式协同服务
@@ -101,8 +101,8 @@ YARN
 >  
 >  Column Family (CF)列族HBase表中的每个列都归属于某个列族，列族必须作为表模式(schema)定义的一部分预先给出。列名以列族作为前缀，每个“列族”都可以有多个列成员(column)；如CF1:math, CF2:english, 新的列族成员（列）可以随后按需、动态加入
 
-##Hive
-
+Hive
+-
 >Hive是基于Hadoop的一个数据仓库工具，可以将结构化的数据文件映射为一张数据库表，并提供简单的sql查询功能，可以将sql语句转换为MapReduce任务进行运行
 
 >结构
@@ -113,8 +113,8 @@ YARN
 
 >Hive的数据存储在HDFS中，大部分的查询、计算由MapReduce完成（包含*的查询，比如select * from tbl不会生成MapRedcue任务）。
 
-##Kylin
-
+Kylin
+-
 >Kylin一个开源的分布式分析引擎，提供Hadoop之上的SQL查询接口及多维分析（OLAP）能力以支持超大规模数据
 
 ![](http://i.imgur.com/oKxHeoG.png)
@@ -125,8 +125,8 @@ YARN
 >假设我们有4个dimension，这个Cube中每个节点（称作Cuboid）都是这4个dimension的不同组合，每个组合定义了一组分析的dimension（如group by），measure的聚合结果就保存在这每个Cuboid上。查询时根据SQL找到对应的Cuboid，读取measure的值，即可返回。
 >![](http://i.imgur.com/InfEvAB.png)
 
-##Spark
-
+Spark
+-
 >Spark是专为大规模数据处理而设计的快速通用的计算引擎,启用了内存分布数据集
 
 ![](http://i.imgur.com/df5XVE3.png)
@@ -140,7 +140,8 @@ YARN
 >Spark的计算发生在RDD的action操作，而对action之前的所有transformation，Spark只是记录下RDD生成的轨迹，而不会触发真正的计算。
 Spark内核会在需要计算发生的时刻绘制一张关于计算路径的有向无环图，也就是DAG。
 
-##Sqoop
+Sqoop
+-
 >用于在Hadoop(Hive)与传统的数据库(mysql、postgresql...)间进行数据的传递，可以将一个关系型数据库（例如 ： MySQL ,Oracle ,Postgres等）中的数据导进到Hadoop的HDFS中，也可以将HDFS的数据导进到关系型数据库中。
 
 ![](http://i.imgur.com/3Q3JAI6.png)
@@ -156,7 +157,8 @@ Spark内核会在需要计算发生的时刻绘制一张关于计算路径的有
 
 >5.将这些记录写到HDFS中，在写入到HDFS的过程中，同样会使用Sqoop生成的类进行序列化
 
-##Flume
+Flume
+-
 >Flume是Cloudera提供的一个高可用的，高可靠的，分布式的海量日志采集、聚合和传输的系统，Flume支持在日志系统中定制各类数据发送方，用于收集数据；同时，Flume提供对数据进行简单处理，并写到各种数据接受方（可定制）的能力。
 
 ![](http://i.imgur.com/0LAy4l6.png)
@@ -169,7 +171,8 @@ Spark内核会在需要计算发生的时刻绘制一张关于计算路径的有
 
 ![](http://i.imgur.com/TJp9lwm.png)
 
-##Kafka
+Kafka
+-
 >Kafka是一种高吞吐量的分布式发布消息队列，处理动作流数据。
 
 ![](http://i.imgur.com/06PfpwT.png)
@@ -185,7 +188,7 @@ Spark内核会在需要计算发生的时刻绘制一张关于计算路径的有
 
 >Consumer Group:每个Consumer属于一个特定的Consumer Group可为每个Consumer指定group name，若不指定group name则属于默认的group。
 
-#应用场景
+应用场景
 
 ##日志收集处理
 ![](http://i.imgur.com/bcslRpZ.png)
