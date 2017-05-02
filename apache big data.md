@@ -1,5 +1,6 @@
 大数据组件介绍
->技术研发中心  
+-
+>技术研发中心  
 
 组件
 -
@@ -7,6 +8,7 @@
 ![](http://i.imgur.com/TGjoj1b.png)
 
 Hadoop
+-
 > hadoop主要包含三个组件：hdfs、mapreduce、yarn
 
 
@@ -188,6 +190,7 @@ Kafka
 >Consumer Group:每个Consumer属于一个特定的Consumer Group可为每个Consumer指定group name，若不指定group name则属于默认的group。
 
 应用场景
+-
 
 日志收集处理
 -
