@@ -202,4 +202,4 @@ Kafka
 -
 ![](http://i.imgur.com/VwWJFzL.png)
 
->该项目通过hive按照日期分区的方式，每天定时把新增数据导入到新增分区中进行分析，kylin使用hive的KYLIN_ANALYSIS表，把全表的字段作为维度，对表中的:USER_ID，IP，URL,TP(页面停留时间)，进行度量，通过kylin的预计算，把结果存放到hbase中，用来提升查询效率。
+>该项目通过hive按照日期分区的方式，每天定时把新增数据导入到新增分区中按照小时指标和天指标进行分析，并把结果数据导出到mysql中。kylin使用hive的KYLIN_ANALYSIS表，把全表的字段作为维度，对表中的:USER_ID，IP，URL,TP(页面停留时间)，进行度量，通过kylin的预计算，把结果存放到hbase中，用来提升查询效率。
