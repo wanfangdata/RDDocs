@@ -219,7 +219,7 @@ Kafka
 ![](http://i.imgur.com/jt5TIgY.png)
 
 >1.用户线上行为记录
->>用户访问http://new.wanfangdata.com.cn/时会根据定义的日志类，记录用户的行为。包括：用户操作行为（user\_operate）、用户注册行为（user_register）。每隔一个小时在对应的目录下生成一个文件名称为xxx.log.yyyy-mm-dd-hh
+>>用户访问http://new.wanfangdata.com.cn 时会根据定义的日志类，记录用户的行为。包括：用户操作行为（user\_operate）、用户注册行为（user_register）。每隔一个小时在对应的目录下生成一个文件名称为xxx.log.yyyy-mm-dd-hh
 
 >2.flume收集日志
 >>由于要监控两个不同的日志目录，并导出到hdfs不同的目录下，所以flume采用多数据源，多扇出通道的方式进行配置。
