@@ -214,6 +214,7 @@ Kafka
 >>>流向kafka的数据被分散到集群中的多个kafka服务器上减轻单个服务器的压力，并根据配置的时间策略进行删除。
 
 >>>spark streaming作为消费者去消费kafka中的数据，并把实时处理（秒级延迟）的结果数据写回到kafka或者redis,以便其他程序去调用。
+
 新平台项目应用
 -
 ![](http://i.imgur.com/jt5TIgY.png)
@@ -244,7 +245,7 @@ Kafka
 
 >>>提取user\_operate\_log表中user_id、ip、age、education\_leve、reserch\_domain、title等字段，插入到kylin\_analysis表中。
 
->>>kylin ui（http://10.10.184.215:7070/kylin）上新建kylin model、kylin cube。
+>>>kylin ui（http://10.10.184.215:7070/kylin ）上新建kylin model、kylin cube。
 >
 >>>这里使用数据源表kylin\_analysis作为维度表和查询表。以表中的所有字段作为维度建立kylin数据模型。在该数据模型的基础上创建包含所有维度的cube，对表中的:user_id、ip、url、tp(页面停留时间)，进行预计算，把计算结果存入hbase中，用来提升查询效率。
 
