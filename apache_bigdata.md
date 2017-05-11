@@ -196,10 +196,56 @@ Kafka
 -
 ![](http://i.imgur.com/bcslRpZ.png)
 
->用户的线上行为会被记录为用户日志，flume监控日志文件目录，配置扇出通道，其一把数据同步到hdfs，其二把数据写到kafaka集群。hdfs上的数据应用hive进行分析，并把分析结果数据通过sqoop导入到mysql；kafka中的数据则通过spark streaming进行流式处理，结果数据存入redis。
+> 1.用户的线上行为记录
+>>用户的访问nginx的行为，会被自定义的日志类，记录为特定格式的日志例如（user^ip^date^url）并保存到指定的日志目录下。
 
+> 2.flume收集日志
+>>flume监控指定的日志目录，根据定义好的的sink、source（这里用到了多路扇出数据流，分别流向hadoop和kafka）。
+
+> 3.数据处理
+>>3.1.离线部分
+>>>流向hadoop的数据会被存储到hdfs中，并根据hadoop的配置的副本数，自动的做数据复制，保证数据的高可用性。
+
+>>>通过hive创建与日志格式相对应的hive外表（防止删表时删除数据），然后load数据，把数据真实存在的目录映射到hive表中，使用hive进行分析。
+
+>>>hive的分析结果存在于hive表中，通过sqoop导出到mysql中以便web展示使用。
+
+>>3.2.实时部分
+>>>流向kafka的数据被分散到集群中的多个kafka服务器上减轻单个服务器的压力，并根据配置的时间策略进行删除。
+
+>>>spark streaming作为消费者去消费kafka中的数据，并把实时处理（秒级延迟）的结果数据写回到kafka或者redis,以便其他程序去调用。
 新平台项目应用
 -
-![](http://i.imgur.com/VwWJFzL.png)
+![](http://i.imgur.com/jt5TIgY.png)
 
->该项目通过hive按照日期分区的方式，每天定时把新增数据导入到新增分区中按照小时指标和天指标进行分析，并把结果数据导出到mysql中。kylin使用hive的KYLIN_ANALYSIS表，把全表的字段作为维度，对表中的:USER_ID，IP，URL,TP(页面停留时间)，进行度量，通过kylin的预计算，把结果存放到hbase中，用来提升查询效率。
+>1.用户线上行为记录
+>>用户访问http://new.wanfangdata.com.cn/时会根据定义的日志类，记录用户的行为。包括：用户操作行为（user\_operate）、用户注册行为（user_register）。每隔一个小时在对应的目录下生成一个文件名称为xxx.log.yyyy-mm-dd-hh
+
+>2.flume收集日志
+>>由于要监控两个不同的日志目录，并导出到hdfs不同的目录下，所以flume采用多数据源，多扇出通道的方式进行配置。
+
+>>source1监控user\_operate日志目录，并把数据通过扇出通道sink1写入hdfs上对应的 /flume/wanfang/user\_operate_log/YEAR/MONTH/DAY/HOUR目录下。
+
+>>source2监控user_register日志目录，并把数据通过扇出通道sink2写入hdfs上对应的 /flume/wanfang/user\_register\_log/YEAR/MONTH/DAY/HOUR目录下。
+
+>3.数据处理
+>>3.1.hive分析
+
+>>>根据两种日志的格式，在hive中创建与日志格式对应的hive外表：user\_operate\_log表、user\_registered_log表。这两张表都是以:年、月、日、时进行分区的。linux定时任务会把hdfs上每天每小时新增的日志映射到这两张表的对应分区中，用来实现对新增数据的处理。
+
+>>>对user\_operate\_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：基础指标、访客属性、搜索引擎分析、网站浏览量、独立访客数、检索词、全部来源、外部链接、资源使用、网站概况等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
+
+>>>对user\_registered_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：新增访客数、活跃率等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
+
+>>>以上的分析结果会通过sqoop导出到mysql集群中，以便web展示使用。
+
+>>3.2.kylin分析
+>>>kylin以hive中的kylin\_analysis表为数据源，该表按照：日、时进行分区，定时把新增数据导入分区中用来处理新增的数据。
+
+>>>提取user\_operate\_log表中user_id、ip、age、education\_leve、reserch\_domain、title等字段，插入到kylin\_analysis表中。
+
+>>>kylin ui（http://10.10.184.215:7070/kylin）上新建kylin model、kylin cube。
+>
+>>>这里使用数据源表kylin\_analysis作为维度表和查询表。以表中的所有字段作为维度建立kylin数据模型。在该数据模型的基础上创建包含所有维度的cube，对表中的:user_id、ip、url、tp(页面停留时间)，进行预计算，把计算结果存入hbase中，用来提升查询效率。
+
+>>>web展示可以通过java api进行查询，也可以使用restful api进行查询。
