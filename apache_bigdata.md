@@ -1,8 +1,8 @@
-《新平台项目的大数据应用》
+《新一代知识服务平台项目中的大数据应用》
 -
 >技术研发中心
 
->新平台系统日志统计分析处理，使用较为流行apache开源项目中hadoop、hive、hbase、flume、Kylin等框架，实现大数据下分布式存储、计算和统计分析功能，具体流程如下：
+>新平台系统日志统计分析处理，使用较为流行apache开源项目中hadoop、hive、hbase、flume、Kylin等框架，实现大数据下分布式存储、计算和统计分析功能，包含了从用户日志的产生到flume采集日志，日志传输到hdfs进行存储，进而使用hive和kylin框架进行各指标分析。具体流程如下：
 
 ![](http://i.imgur.com/jt5TIgY.png)
 
@@ -47,7 +47,7 @@
 
 Hadoop
 -
-> hadoop主要包含三个组件：hdfs、mapreduce、yarn
+> Hadoop主要包含三个组件：HDFS、MapReduce、YARN
 
 
 分布式存储系统HDFS （Hadoop Distributed File System ）
