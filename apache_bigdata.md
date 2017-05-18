@@ -2,7 +2,7 @@
 -
 >技术研发中心
 
->新平台系统日志统计分析处理，使用较为流行apache开源项目中hadoop、hive、hbase、flume、Kylin等框架，实现大数据下分布式存储、计算和统计分析功能，包含了从用户日志的产生到flume采集日志，日志传输到hdfs进行存储，进而使用hive和kylin框架进行各指标分析。具体流程如下：
+>新平台系统日志统计分析处理，使用较为流行apache开源项目中hadoop、hive、hbase、flume、Kylin等框架，实现大数据下分布式存储、计算和统计分析功能，包含了从用户日志的产生到flume采集日志，日志传输到hdfs进行存储，进而使用hive和kylin框架进行各指标分析，分析结果数据导出到mysql进行web展示。具体流程如下：
 
 ![](http://i.imgur.com/jt5TIgY.png)
 
@@ -40,9 +40,6 @@
 
 各技术框架具体参照下面介绍
 -
-组件
--
-
 ![](http://i.imgur.com/TGjoj1b.png)
 
 Hadoop
