@@ -1,7 +1,45 @@
-大数据组件介绍
+《新平台项目的大数据应用》
 -
->技术研发中心  
+>技术研发中心
 
+>新平台系统日志统计分析处理，使用较为流行apache开源项目中hadoop、hive、hbase、flume、Kylin等框架，实现大数据下分布式存储、计算和统计分析功能，具体流程如下：
+
+![](http://i.imgur.com/jt5TIgY.png)
+
+>1.用户线上行为记录
+>>用户访问http://new.wanfangdata.com.cn 时会根据定义的日志类，记录用户的行为。包括：用户操作行为（user\_operate）、用户注册行为（user_register）。每隔一个小时在对应的目录下生成一个文件名称为xxx.log.yyyy-mm-dd-hh
+
+>2.flume收集日志
+>>由于要监控两个不同的日志目录，并导出到hdfs不同的目录下，所以flume采用多数据源，多扇出通道的方式进行配置。
+
+>>source1监控user\_operate日志目录，并把数据通过扇出通道sink1写入hdfs上对应的 /flume/wanfang/user\_operate_log/YEAR/MONTH/DAY/HOUR目录下。
+
+>>source2监控user_register日志目录，并把数据通过扇出通道sink2写入hdfs上对应的 /flume/wanfang/user\_register\_log/YEAR/MONTH/DAY/HOUR目录下。
+
+>3.数据处理
+>>3.1.hive分析
+
+>>>根据两种日志的格式，在hive中创建与日志格式对应的hive外表：user\_operate\_log表、user\_registered_log表。这两张表都是以：年、月、日、时进行分区的。linux定时任务会把hdfs上每天每小时新增的日志映射到这两张表的对应分区中，用来实现对新增数据的处理。
+
+>>>对user\_operate\_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：基础指标、访客属性、搜索引擎分析、网站浏览量、独立访客数、检索词、全部来源、外部链接、资源使用、网站概况等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
+
+>>>对user\_registered_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：新增访客数、活跃率等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
+
+>>>以上的分析结果会通过sqoop导出到mysql集群中，以便web展示使用。
+
+>>3.2.kylin分析
+>>>kylin以hive中的kylin\_analysis表为数据源，该表按照：日、时进行分区，定时把新增数据导入分区中用来处理新增的数据。
+
+>>>提取user\_operate\_log表中user_id、ip、age、education\_leve、reserch\_domain、title等字段，插入到kylin\_analysis表中。
+
+>>>kylin ui（http://10.10.184.215:7070/kylin ）上新建kylin model、kylin cube。
+>
+>>>这里使用数据源表kylin\_analysis作为维度表和查询表。以表中的所有字段作为维度建立kylin数据模型。在该数据模型的基础上创建包含所有维度的cube，对表中的:user_id、ip、url、tp(页面停留时间)，进行预计算，把计算结果存入hbase中，用来提升查询效率。
+
+>>>web展示可以通过java api进行查询，也可以使用restful api进行查询。
+
+各技术框架具体参照下面介绍
+-
 组件
 -
 
@@ -189,10 +227,7 @@ Kafka
 
 >Consumer Group:每个Consumer属于一个特定的Consumer Group可为每个Consumer指定group name，若不指定group name则属于默认的group。
 
-应用场景
--
-
-日志收集处理
+总结：大数据系统日志收集处理的一般流程
 -
 ![](http://i.imgur.com/bcslRpZ.png)
 
@@ -215,38 +250,3 @@ Kafka
 
 >>>spark streaming作为消费者去消费kafka中的数据，并把实时处理（秒级延迟）的结果数据写回到kafka或者redis,以便其他程序去调用。
 
-新平台项目应用
--
-![](http://i.imgur.com/jt5TIgY.png)
-
->1.用户线上行为记录
->>用户访问http://new.wanfangdata.com.cn 时会根据定义的日志类，记录用户的行为。包括：用户操作行为（user\_operate）、用户注册行为（user_register）。每隔一个小时在对应的目录下生成一个文件名称为xxx.log.yyyy-mm-dd-hh
-
->2.flume收集日志
->>由于要监控两个不同的日志目录，并导出到hdfs不同的目录下，所以flume采用多数据源，多扇出通道的方式进行配置。
-
->>source1监控user\_operate日志目录，并把数据通过扇出通道sink1写入hdfs上对应的 /flume/wanfang/user\_operate_log/YEAR/MONTH/DAY/HOUR目录下。
-
->>source2监控user_register日志目录，并把数据通过扇出通道sink2写入hdfs上对应的 /flume/wanfang/user\_register\_log/YEAR/MONTH/DAY/HOUR目录下。
-
->3.数据处理
->>3.1.hive分析
-
->>>根据两种日志的格式，在hive中创建与日志格式对应的hive外表：user\_operate\_log表、user\_registered_log表。这两张表都是以：年、月、日、时进行分区的。linux定时任务会把hdfs上每天每小时新增的日志映射到这两张表的对应分区中，用来实现对新增数据的处理。
-
->>>对user\_operate\_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：基础指标、访客属性、搜索引擎分析、网站浏览量、独立访客数、检索词、全部来源、外部链接、资源使用、网站概况等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
-
->>>对user\_registered_log表进行与业务相关的组合查询，hive会把执行的hql语句转化为mapreduce任务提交到hadoop集群中进行计算，得出不同的分析指标：新增访客数、活跃率等指标。这些指标会从 小时维度 和 天维度 分别进行统计。
-
->>>以上的分析结果会通过sqoop导出到mysql集群中，以便web展示使用。
-
->>3.2.kylin分析
->>>kylin以hive中的kylin\_analysis表为数据源，该表按照：日、时进行分区，定时把新增数据导入分区中用来处理新增的数据。
-
->>>提取user\_operate\_log表中user_id、ip、age、education\_leve、reserch\_domain、title等字段，插入到kylin\_analysis表中。
-
->>>kylin ui（http://10.10.184.215:7070/kylin ）上新建kylin model、kylin cube。
->
->>>这里使用数据源表kylin\_analysis作为维度表和查询表。以表中的所有字段作为维度建立kylin数据模型。在该数据模型的基础上创建包含所有维度的cube，对表中的:user_id、ip、url、tp(页面停留时间)，进行预计算，把计算结果存入hbase中，用来提升查询效率。
-
->>>web展示可以通过java api进行查询，也可以使用restful api进行查询。
